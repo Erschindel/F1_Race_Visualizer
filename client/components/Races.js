@@ -1,5 +1,5 @@
 import React from 'react';
-import { getLatestRace, getAllRaces, getSpecificRace } from '../store/allRaces';
+import { getLatestRace, getAllRaces, getRaceLaps } from '../store/allRaces';
 import { connect } from 'react-redux';
 import RaceMap from './RaceMap';
 
@@ -7,49 +7,87 @@ class Races extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      year: 2022,
-      raceRound: 1,
+      year: '',
+      raceRound: '',
+      raceName: '',
       lap: '',
     };
     this.handleYear = this.handleYear.bind(this);
     this.handleRace = this.handleRace.bind(this);
+    this.handleLap = this.handleLap.bind(this);
   }
   componentDidMount() {
-    this.props.getAllFromYear(2022);
+    this.props.getAllFromYear();
     this.props.getLatest();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.races !== this.props.races) {
+      this.setState({
+        year: this.props.races[0].season || '',
+        raceRound: this.props.laps.number || '',
+      });
+    }
   }
   handleYear(e) {
     e.preventDefault();
     this.setState({
       year: e.target.value,
+      raceRound: '-- select race --',
     });
-    this.props.getAllFromYear(this.state.year);
+    this.props.getAllFromYear(e.target.value);
   }
   handleRace(e) {
     e.preventDefault();
+    console.log();
     this.setState({
       raceRound: e.target.value,
+      raceName: e.target.children[e.target.value].innerText,
     });
-    this.props.getRace(this.state.year, this.state.raceRound);
+    if (e.target.value !== '-- select race --') {
+      this.props.getRace(
+        this.state.year,
+        e.target.value,
+        e.target.children[e.target.value].innerText
+      );
+    }
+  }
+  handleLap(e) {
+    e.preventDefault();
+    this.setState({
+      lap: e.target.value,
+    });
+    this.props.getRace(
+      this.state.year,
+      this.state.raceRound,
+      this.state.raceName,
+      e.target.value
+    );
   }
   render() {
-    const { races, latest, specific } = this.props;
-    // console.log(this.props);
+    const { races, latest, laps } = this.props;
+    const { year, raceRound } = this.state;
+    console.log(laps);
+    console.log('props:', this.props);
+    // console.log('state:', this.state);
     return (
       <div className="container">
-        {/* current race info, default to most recent available */}
         <h1>{latest.raceName}</h1>
         {/* <h1>{allRaces[0].season}</h1> */}
-        <select name="year" id="" onChange={this.handleYear}>
-          {/* <option value="none">none</option> */}
-          <option value="2022">2022</option>
-          <option value="2021">2021</option>
-          <option value="2020">2020</option>
-          <option value="2019">2019</option>
-          <option value="2018">2018</option>
-          <option value="2010">2010</option>
+        <select name="year" id="" onChange={this.handleYear} value={year}>
+          {/* <option value="none">(select year)</option> */}
+          {Array(9)
+            .fill(0)
+            .map((_, i) => {
+              return (
+                <option key={i} value={String(i + 2014)}>
+                  {i + 2014}
+                </option>
+              );
+            })}
         </select>
-        <select name="race" id="" onChange={this.handleRace}>
+        <select name="race" id="" onChange={this.handleRace} value={raceRound}>
+          <option value={null}>-- select race --</option>
           {races.map((x, i) => {
             return (
               <option key={i} value={i + 1}>
@@ -58,8 +96,26 @@ class Races extends React.Component {
             );
           })}
         </select>
-        <br />
-        {specific.Timings && <RaceMap />}
+
+        {laps.race && this.state.raceRound !== '-- select race --' && (
+          <div>
+            <select name="lap" id="" onChange={this.handleLap}>
+              {Array(10)
+                .fill(0)
+                .map((_, i) => {
+                  return (
+                    <option key={i} value={i + 1}>
+                      {i + 1}
+                    </option>
+                  );
+                })}
+            </select>
+
+            <br />
+            <br />
+            <RaceMap race={laps.race} handleLap={this.handleLap} />
+          </div>
+        )}
       </div>
     );
   }
@@ -69,7 +125,8 @@ function getStateFromProps(state) {
   return {
     races: state.races,
     latest: state.latest,
-    specific: state.current,
+    laps: state.laps,
+    // shape: state.laps.shape,
   };
 }
 
@@ -77,8 +134,8 @@ function getDispatchFromProps(dispatch) {
   return {
     getLatest: () => dispatch(getLatestRace()),
     getAllFromYear: (year = 2022) => dispatch(getAllRaces(year)),
-    getRace: (year, round, lap = 1) =>
-      dispatch(getSpecificRace(year, round, lap)),
+    getRace: (year, round, name, lap = 1) =>
+      dispatch(getRaceLaps(year, round, name, lap)),
   };
 }
 

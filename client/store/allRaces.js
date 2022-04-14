@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const GET_RACES_FROM_YEAR = 'GET_RACES_FROM_YEAR';
 const GET_MOST_RECENT = 'GET_MOST_RECENT';
-const GET_RACE = 'GET_RACE';
+const GET_LAPS = 'GET_LAPS';
 
 const getAllFromYear = (races) => {
   return {
@@ -18,10 +18,10 @@ const getMostRecent = (race) => {
   };
 };
 
-const getRace = (race) => {
+const getLaps = (laps) => {
   return {
-    type: GET_RACE,
-    race,
+    type: GET_LAPS,
+    laps,
   };
 };
 
@@ -49,7 +49,7 @@ export const getAllRaces = (year) => {
   };
 };
 
-export const getSpecificRace = (year, round, lap) => {
+export const getRaceLaps = (year, round, name, lap) => {
   return async (dispatch) => {
     try {
       // get data from ergast
@@ -57,10 +57,18 @@ export const getSpecificRace = (year, round, lap) => {
       const external = await axios.get(
         `http://ergast.com/api/f1/${year}/${round}/laps/${lap}.json`
       );
-      // const internal = await axios.get('/api/races');
-      external.data.MRData.RaceTable.Races[0].Laps
-        ? dispatch(getRace(external.data.MRData.RaceTable.Races[0].Laps[0]))
-        : dispatch(getRace(external.data.MRData.RaceTable.Races)); // selected race hasn't occurred yet (empty array)
+      const slug = name.replace(/\s/g, '_');
+      const { shape } = await axios.get(`/api/tracks/${slug}`);
+      external.data.MRData.RaceTable.Races[0]
+        ? dispatch(
+            getLaps({
+              race: external.data.MRData.RaceTable.Races[0].Laps[0],
+              shape,
+            })
+          )
+        : dispatch(
+            getLaps({ race: external.data.MRData.RaceTable.Races, shape })
+          ); // conditional in case selected race hasn't occurred yet (empty array)
     } catch (error) {
       console.log(error);
     }
@@ -70,7 +78,10 @@ export const getSpecificRace = (year, round, lap) => {
 const initialState = {
   races: [],
   latest: {},
-  current: {},
+  laps: {
+    race: {},
+    shape: '',
+  },
 };
 
 const raceReducer = (state = initialState, action) => {
@@ -79,8 +90,8 @@ const raceReducer = (state = initialState, action) => {
       return { ...state, races: action.races };
     case GET_MOST_RECENT:
       return { ...state, latest: action.race };
-    case GET_RACE:
-      return { ...state, current: action.race };
+    case GET_LAPS:
+      return { ...state, laps: { race: action.laps, shape: action.shape } };
     default:
       return state;
   }

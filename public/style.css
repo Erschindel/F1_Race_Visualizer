@@ -18,3 +18,38 @@ nav{
     color:aliceblue
 
 }
+
+.mapContainer{
+    display: flex;
+    /* align-items:center; */
+    justify-content: center;
+    height: 100%
+}
+
+.mapLeft{
+    display: flex;
+    margin: 0 20px
+}
+
+.mapRight{
+    display: flex;
+    background: #999;
+    width: 75%;
+    height: 500px;
+    fill:none;
+    stroke:#000000;
+    stroke-width:0.264583px;
+    stroke-linecap:butt;
+    stroke-linejoin:miter;
+    stroke-opacity:1
+}
+
+.path1{
+    fill: none; 
+    stroke: blue;
+}
+
+.path2{
+    fill: yellow; 
+    stroke: red;
+}
