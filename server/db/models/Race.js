@@ -1,7 +1,7 @@
-const db = require('../db');
-const Sequelize = require('sequelize');
+const db = require("../db");
+const Sequelize = require("sequelize");
 
-module.exports = db.define('race', {
+module.exports = db.define("race", {
   date: {
     type: Sequelize.DATE,
     allowNull: false,

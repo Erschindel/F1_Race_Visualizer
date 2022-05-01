@@ -1,22 +1,25 @@
-import React from 'react';
-import { getLatestRace, getAllRaces, getRaceLaps } from '../store/allRaces';
-import { connect } from 'react-redux';
-import RaceMap from './RaceMap';
+import React from "react";
+import { getLatestRace, getAllRaces, getRaceLaps } from "../store/allRaces";
+import { connect } from "react-redux";
+import D3_view from "./D3_view";
+import Racers from "./Racers";
 
 class Races extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      year: '',
-      raceRound: '',
-      raceName: '',
-      lap: '',
+      year: "",
+      raceRound: "",
+      raceName: "",
+      lap: "",
     };
     this.handleYear = this.handleYear.bind(this);
     this.handleRace = this.handleRace.bind(this);
     this.handleLap = this.handleLap.bind(this);
+    this.reset = this.reset.bind(this);
   }
   componentDidMount() {
+    this.reset();
     this.props.getAllFromYear();
     this.props.getLatest();
   }
@@ -24,8 +27,8 @@ class Races extends React.Component {
   componentDidUpdate(prevProps) {
     if (prevProps.races !== this.props.races) {
       this.setState({
-        year: this.props.races[0].season || '',
-        raceRound: this.props.laps.number || '',
+        year: this.props.races[0].season || "",
+        raceRound: this.props.laps.number || "",
       });
     }
   }
@@ -33,24 +36,31 @@ class Races extends React.Component {
     e.preventDefault();
     this.setState({
       year: e.target.value,
-      raceRound: '-- select race --',
+      raceRound: "-- select race --",
     });
     this.props.getAllFromYear(e.target.value);
   }
   handleRace(e) {
     e.preventDefault();
-    console.log();
+    const inner = e.target.children[e.target.value];
     this.setState({
       raceRound: e.target.value,
-      raceName: e.target.children[e.target.value].innerText,
+      raceName: inner ? inner.innerText : "-- select race --",
     });
-    if (e.target.value !== '-- select race --') {
+    if (e.target.value !== "-- select race --") {
       this.props.getRace(
         this.state.year,
         e.target.value,
         e.target.children[e.target.value].innerText
       );
     }
+  }
+  reset() {
+    this.setState({
+      raceRound: "",
+      raceName: "",
+      lap: "",
+    });
   }
   handleLap(e) {
     e.preventDefault();
@@ -67,27 +77,39 @@ class Races extends React.Component {
   render() {
     const { races, latest, laps } = this.props;
     const { year, raceRound } = this.state;
-    console.log(laps);
-    console.log('props:', this.props);
+    // console.log("races:", this.props);
     // console.log('state:', this.state);
+
     return (
       <div className="container">
-        <h1>{latest.raceName}</h1>
-        {/* <h1>{allRaces[0].season}</h1> */}
-        <select name="year" id="" onChange={this.handleYear} value={year}>
-          {/* <option value="none">(select year)</option> */}
+        <h1>neeEEEAAAaaaawrwrww</h1>
+        <br />
+        <select
+          name="year"
+          id=""
+          className="form-select form-select-lg mb-3"
+          onChange={this.handleYear}
+          value={year}
+        >
           {Array(9)
             .fill(0)
             .map((_, i) => {
               return (
-                <option key={i} value={String(i + 2014)}>
-                  {i + 2014}
+                <option key={i} value={String(2022 - i)}>
+                  {2022 - i}
                 </option>
               );
             })}
         </select>
-        <select name="race" id="" onChange={this.handleRace} value={raceRound}>
+        <select
+          name="race"
+          id=""
+          className="form-select form-select-lg mb-3"
+          onChange={this.handleRace}
+          value={raceRound}
+        >
           <option value={null}>-- select race --</option>
+          {/* need to update for -- select race -- */}
           {races.map((x, i) => {
             return (
               <option key={i} value={i + 1}>
@@ -96,26 +118,38 @@ class Races extends React.Component {
             );
           })}
         </select>
+        <br />
+        <section className="mapBox">
+          <div className="mapLeft">
+            {laps.race && raceRound && raceRound !== "-- select race --" && (
+              <div>
+                <select
+                  name="lap"
+                  id=""
+                  className="form-select form-select-sm"
+                  onChange={this.handleLap}
+                >
+                  {Array(10)
+                    .fill(0)
+                    .map((_, i) => {
+                      return (
+                        <option key={i} value={i + 1}>
+                          {i + 1}
+                        </option>
+                      );
+                    })}
+                </select>
 
-        {laps.race && this.state.raceRound !== '-- select race --' && (
-          <div>
-            <select name="lap" id="" onChange={this.handleLap}>
-              {Array(10)
-                .fill(0)
-                .map((_, i) => {
-                  return (
-                    <option key={i} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  );
-                })}
-            </select>
+                <br />
+              </div>
+            )}
 
-            <br />
-            <br />
-            <RaceMap race={laps.race} handleLap={this.handleLap} />
+            <Racers />
           </div>
-        )}
+          <div className="mapRight">
+            <D3_view thing={"thing"} />
+          </div>
+        </section>
       </div>
     );
   }
@@ -125,7 +159,7 @@ function getStateFromProps(state) {
   return {
     races: state.races,
     latest: state.latest,
-    laps: state.laps,
+    laps: state.laps.race,
     // shape: state.laps.shape,
   };
 }

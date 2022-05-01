@@ -19,7 +19,7 @@ nav{
 
 }
 
-.mapContainer{
+.mapBox{
     display: flex;
     /* align-items:center; */
     justify-content: center;
@@ -28,20 +28,14 @@ nav{
 
 .mapLeft{
     display: flex;
-    margin: 0 20px
+    margin: 0 20px;
+    width:25vw
 }
 
 .mapRight{
     display: flex;
-    background: #999;
-    width: 75%;
+    width: 75vw;
     height: 500px;
-    fill:none;
-    stroke:#000000;
-    stroke-width:0.264583px;
-    stroke-linecap:butt;
-    stroke-linejoin:miter;
-    stroke-opacity:1
 }
 
 .path1{
@@ -52,4 +46,8 @@ nav{
 .path2{
     fill: yellow; 
     stroke: red;
+}
+
+.fastest{
+    color: limegreen
 }

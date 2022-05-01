@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const About = () => {
   return (
@@ -26,18 +26,18 @@ const About = () => {
         The <a href="http://ergast.com/mrd/">Ergast API</a> is my primary source
         of race data. Each race is connected to a set of laps, and each lap has
         a set of lap times for each driver. While this source doesn't provide
-        second-by-second data, it is enough to present{' '}
-        <strong>normalized</strong> representations of each race. Note that the
+        second-by-second data, it is enough to present{" "}
+        <strong>normalized</strong> representations of each lap. Note that the
         data seems to only include vehicles that are still competing for points
         (only the top 10 finishers receive points), so the last few laps of each
         race will generally only include the fastest ~12 cars.
       </p>
-      <p>My postgres database contains custom SVG files of each track.</p>
+      <p>My database contains custom SVG files of each track.</p>
       <p>
-        I used <a href="https://vectorjs.org/">VectorJS</a> to animate drivers
-        around the chosen track.
+        I used <a href="https://d3js.org/">d3.js</a> to animate drivers around
+        the chosen track.
       </p>
-      <p>Other tools: React, Redux, Express, Node.</p>
+      <p>Other tools: React, Redux, Express, Node, Postgres.</p>
       <br />
       <h2>Coming soon (maybe)</h2>
       <ul>

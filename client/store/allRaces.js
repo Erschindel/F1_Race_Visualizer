@@ -58,16 +58,19 @@ export const getRaceLaps = (year, round, name, lap) => {
         `http://ergast.com/api/f1/${year}/${round}/laps/${lap}.json`
       );
       const slug = name.replace(/\s/g, '_');
-      const { shape } = await axios.get(`/api/tracks/${slug}`);
+      const internal = await axios.get(`/api/tracks/${slug}`);
       external.data.MRData.RaceTable.Races[0]
         ? dispatch(
             getLaps({
               race: external.data.MRData.RaceTable.Races[0].Laps[0],
-              shape,
+              shape: internal.data.shape,
             })
           )
         : dispatch(
-            getLaps({ race: external.data.MRData.RaceTable.Races, shape })
+            getLaps({
+              race: external.data.MRData.RaceTable.Races,
+              shape: internal.data.shape,
+            })
           ); // conditional in case selected race hasn't occurred yet (empty array)
     } catch (error) {
       console.log(error);
