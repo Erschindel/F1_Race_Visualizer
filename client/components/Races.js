@@ -47,7 +47,9 @@ class Races extends React.Component {
       raceRound: e.target.value,
       raceName: inner ? inner.innerText : "-- select race --",
     });
-    if (e.target.value !== "-- select race --") {
+    if (e.target.value === "-- select race --") {
+      this.reset();
+    } else {
       this.props.getRace(
         this.state.year,
         e.target.value,
@@ -75,10 +77,8 @@ class Races extends React.Component {
     );
   }
   render() {
-    const { races, latest, laps } = this.props;
+    const { races, latest } = this.props;
     const { year, raceRound } = this.state;
-    // console.log("races:", this.props);
-    // console.log('state:', this.state);
 
     return (
       <div className="container">
@@ -109,7 +109,6 @@ class Races extends React.Component {
           value={raceRound}
         >
           <option value={null}>-- select race --</option>
-          {/* need to update for -- select race -- */}
           {races.map((x, i) => {
             return (
               <option key={i} value={i + 1}>
@@ -119,37 +118,12 @@ class Races extends React.Component {
           })}
         </select>
         <br />
-        <section className="mapBox">
-          <div className="mapLeft">
-            {laps.race && raceRound && raceRound !== "-- select race --" && (
-              <div>
-                <select
-                  name="lap"
-                  id=""
-                  className="form-select form-select-sm"
-                  onChange={this.handleLap}
-                >
-                  {Array(10)
-                    .fill(0)
-                    .map((_, i) => {
-                      return (
-                        <option key={i} value={i + 1}>
-                          {i + 1}
-                        </option>
-                      );
-                    })}
-                </select>
-
-                <br />
-              </div>
-            )}
-
-            <Racers />
-          </div>
-          <div className="mapRight">
-            <D3_view thing={"thing"} />
-          </div>
-        </section>
+        {this.state.raceRound !== "" && (
+          <section className="mapBox">
+            <Racers handleLap={this.handleLap} />
+            <D3_view />
+          </section>
+        )}
       </div>
     );
   }
@@ -160,7 +134,6 @@ function getStateFromProps(state) {
     races: state.races,
     latest: state.latest,
     laps: state.laps.race,
-    // shape: state.laps.shape,
   };
 }
 

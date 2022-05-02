@@ -11,9 +11,6 @@ const Navbar = () => {
       <Link to="/about" className="nav-item">
         About
       </Link>
-      {/* <Link to="/D3_view" className="nav-item">
-        D3_view
-      </Link> */}
     </nav>
   );
 };

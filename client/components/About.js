@@ -5,9 +5,9 @@ const About = () => {
     <div className="container">
       <h1>About this project</h1>
       <br />
-      <p>
+      {/* <p>
         This is my submission for my Async week project for Fullstack Academy.
-      </p>
+      </p> */}
       <p>
         A few friends have recently gotten me interested in the world of Formula
         1 racing. F1 is an international motorsport competition that puts the

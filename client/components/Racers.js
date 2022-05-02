@@ -1,35 +1,55 @@
 import React from "react";
 import { connect } from "react-redux";
 
-class Racers extends React.Component {
-  render() {
-    const { laps } = this.props;
-    const fastest = {};
-    const times = [];
-    let loadedRace = false;
+const Racers = (props) => {
+  const { laps, handleLap } = props;
+  const fastest = {};
+  const times = [];
+  let loadedRace = false;
 
-    laps.race && laps.race.Timings && (loadedRace = true);
+  laps.race && laps.race.Timings && (loadedRace = true);
 
-    if (loadedRace) {
-      laps.race.Timings.forEach((x, i) => {
-        const timeStr = x.time;
-        const min = Number(timeStr.split(":")[0]);
-        const [sec, milli] = timeStr.split(":")[1].split(".");
-        const totalMillis =
-          min * 60 * 1000 + Number(sec) * 1000 + Number(milli);
-        times.push(totalMillis);
-        if (!fastest.totalMillis || fastest.totalMillis > totalMillis) {
-          fastest.totalMillis = totalMillis;
-          fastest.i = i;
-          fastest.time = timeStr;
-        }
-      });
-    }
-    return (
-      <div>
-        {loadedRace && (
+  if (loadedRace) {
+    laps.race.Timings.forEach((x, i) => {
+      const timeStr = x.time;
+      const min = Number(timeStr.split(":")[0]);
+      const [sec, milli] = timeStr.split(":")[1].split(".");
+      const totalMillis = min * 60 * 1000 + Number(sec) * 1000 + Number(milli);
+      times.push(totalMillis);
+      if (!fastest.totalMillis || fastest.totalMillis > totalMillis) {
+        fastest.totalMillis = totalMillis;
+        fastest.i = i;
+        fastest.time = timeStr;
+      }
+    });
+  }
+  return (
+    <div className="mapLeft">
+      {loadedRace && (
+        <div>
+          <div>
+            <select
+              name="lap"
+              className="form-select form-select-sm"
+              onChange={handleLap}
+            >
+              {Array(80)
+                .fill(0)
+                .map((_, i) => {
+                  return (
+                    <option key={i} value={i + 1}>
+                      {i + 1}
+                    </option>
+                  );
+                })}
+            </select>
+
+            <br />
+          </div>
           <div className={"container"}>
-            <p>Fastest lap: {fastest.time}</p>
+            <p>
+              <span className={"fastest"}>Fastest</span> lap - {fastest.time}
+            </p>
             <ol>
               {laps.race.Timings.map((x, i) => {
                 return (
@@ -42,16 +62,12 @@ class Racers extends React.Component {
                 );
               })}
             </ol>
-            <p>Number - race position</p>
-            <p>
-              <span className={"fastest"}>Green</span> - fastest lap
-            </p>
           </div>
-        )}
-      </div>
-    );
-  }
-}
+        </div>
+      )}
+    </div>
+  );
+};
 
 function getStateFromProps(state) {
   return {

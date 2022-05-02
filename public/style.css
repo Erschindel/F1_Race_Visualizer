@@ -16,7 +16,6 @@ nav{
     font-size: 1.5em;
     background: #aaa;
     color:aliceblue
-
 }
 
 .mapBox{
@@ -36,16 +35,6 @@ nav{
     display: flex;
     width: 75vw;
     height: 500px;
-}
-
-.path1{
-    fill: none; 
-    stroke: blue;
-}
-
-.path2{
-    fill: yellow; 
-    stroke: red;
 }
 
 .fastest{
