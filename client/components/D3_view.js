@@ -47,7 +47,7 @@ class D3_view extends React.Component {
         const [sec, milli] = timeStrSplit[1].split(".");
         const totalMillis =
           min * 60 * 1000 + Number(sec) * 1000 + Number(milli);
-        times.push(totalMillis);
+        times.push({ totalMillis, driver: x.driverId });
         if (!fastest.totalMillis || fastest.totalMillis > totalMillis) {
           fastest.totalMillis = totalMillis;
           fastest.i = i;
@@ -56,6 +56,7 @@ class D3_view extends React.Component {
       });
     }
 
+    const sortedTimes = times.sort((a, b) => a.totalMillis - b.totalMillis);
     let scalingFactor = 2.5;
 
     // find start coordinates of track from pathData
@@ -105,8 +106,8 @@ class D3_view extends React.Component {
     const bbox = svg.node().parentNode.getBBox();
     svg.attr(
       "transform",
-      `translate(${-bbox.x / scalingFactor + 25},${
-        -bbox.y / scalingFactor + 25
+      `translate(${-bbox.x / scalingFactor + 40},${
+        -bbox.y / scalingFactor + 40
       })`
     );
 
@@ -116,7 +117,20 @@ class D3_view extends React.Component {
     // render markers
     let markers = [];
     loadedRace &&
-      race.Timings.forEach(() => {
+      race.Timings.forEach((_, i) => {
+        // add name text for each marker
+        svg
+          .append("svg:text")
+          .attr("text-anchor", "middle")
+          .attr("transform", `translate(${startX},${startY})`)
+          .attr("class", "driverNames")
+          .style("opacity", 0)
+          .style("display", "block")
+          .style("z-index", -1)
+          .text(function () {
+            return sortedTimes[i].driver;
+          });
+        // create markers
         markers.push(
           svg
             .append("circle")
@@ -125,19 +139,40 @@ class D3_view extends React.Component {
             .attr("fill", "#fff")
             .attr("stroke-width", 2)
             .attr("stroke", "steelblue")
+            .style("display", "block")
+            .style("z-index", 10)
             .attr("transform", `translate(${startX},${startY})`)
         );
       });
 
     // tween markers along path
     markers.forEach((x, i) => {
-      x.transition()
+      x.on("mouseover", function () {
+        const p = fullTrack.getPointAtLength(
+          trackLength * (fastest.totalMillis / times[i].totalMillis)
+        );
+        d3_select(this).attr("r", 10);
+        d3_select(svg.node().childNodes[(i + 1) * 2])
+          .style("opacity", 1)
+          .style("z-index", 10000) // should put text in front of dots, but finnicky
+          .attr(
+            "transform",
+            "translate(" + [p.x * scalingFactor, p.y * scalingFactor + 25] + ")"
+          );
+      })
+        .on("mouseout", function () {
+          d3_select(this).attr("r", 5);
+          d3_select(svg.node().childNodes[(i + 1) * 2])
+            .style("opacity", 0)
+            .style("z-index", -1); // should put text behind dots, but finnicky
+        })
+        .transition()
         .duration(1000)
         .attrTween("transform", function () {
           return trackLength
             ? function (t) {
                 const p = fullTrack.getPointAtLength(
-                  trackLength * (fastest.totalMillis / times[i]) * t // can adjust length of path traveled here
+                  trackLength * (fastest.totalMillis / times[i].totalMillis) * t // can adjust length of path traveled here
                 );
                 return (
                   "translate(" +
@@ -148,12 +183,7 @@ class D3_view extends React.Component {
             : () => "";
         })
         .on("end", function () {
-          d3_select(this)
-            .transition()
-            .duration(600)
-            //   .attr("r", 10)
-            .style("opacity", 0.5);
-          //   .remove();
+          d3_select(this).transition().duration(600).style("opacity", 0.5);
         });
     });
 

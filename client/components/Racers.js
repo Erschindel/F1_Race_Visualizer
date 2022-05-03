@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 const Racers = (props) => {
   const { laps, handleLap } = props;
   const fastest = {};
-  const times = [];
+  //   const times = [];
   let loadedRace = false;
 
   laps.race && laps.race.Timings && (loadedRace = true);
@@ -15,11 +15,12 @@ const Racers = (props) => {
       const min = Number(timeStr.split(":")[0]);
       const [sec, milli] = timeStr.split(":")[1].split(".");
       const totalMillis = min * 60 * 1000 + Number(sec) * 1000 + Number(milli);
-      times.push(totalMillis);
+      //   times.push({ driver: x.driverId, totalMillis });
       if (!fastest.totalMillis || fastest.totalMillis > totalMillis) {
         fastest.totalMillis = totalMillis;
         fastest.i = i;
         fastest.time = timeStr;
+        fastest.driver = x.driverId;
       }
     });
   }
@@ -33,7 +34,7 @@ const Racers = (props) => {
               className="form-select form-select-sm"
               onChange={handleLap}
             >
-              {Array(80)
+              {Array(80) // to do: find correct number of laps
                 .fill(0)
                 .map((_, i) => {
                   return (
