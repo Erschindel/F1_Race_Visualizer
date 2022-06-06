@@ -6,7 +6,8 @@
 nav{
     display: flex;
     align-items: center;
-    background: #aaa
+    background: #aaa;
+    /* width: 100vw; */
 }
 
 .nav-item{
@@ -16,6 +17,17 @@ nav{
     font-size: 1.5em;
     background: #aaa;
     color:aliceblue
+}
+
+.float-right{
+    position:relative;
+    background: #aaa;
+    margin-left: auto;
+    margin-right: 25px;
+}
+
+.gh-logo{
+    background: #aaa;
 }
 
 .mapBox{
@@ -37,7 +49,21 @@ nav{
 }
 
 .fastest{
-    color: limegreen
+    color: limegreen;
+}
+
+.marginTop{
+    margin-top: 12px;
+}
+
+.emojis{
+    display:inline-block;
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+}
+
+.hidden{
+    display: none;
 }
 
 /* .driverNames{

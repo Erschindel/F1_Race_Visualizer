@@ -5,9 +5,6 @@ const About = () => {
     <div className="container">
       <h1>About this project</h1>
       <br />
-      {/* <p>
-        This is my submission for my Async week project for Fullstack Academy.
-      </p> */}
       <p>
         A few friends have recently gotten me interested in the world of Formula
         1 racing. F1 is an international motorsport competition that puts the
@@ -17,8 +14,8 @@ const About = () => {
         season generally includes 20-25 races. Most races are about 50-80 laps.
       </p>
       <p>
-        The goal of this project is to create a visual representation of each
-        race.
+        The goal of this project is to create an interactive, lap-by-lap visual
+        representation of each race.
       </p>
       <br />
       <h2>Data and tools</h2>
@@ -31,6 +28,11 @@ const About = () => {
         data seems to only include vehicles that are still competing for points
         (only the top 10 finishers receive points), so the last few laps of each
         race will generally only include the fastest ~12 cars.
+      </p>
+      <p>
+        Supplemental circuit information, such as the length of the track and
+        the total race length, was scraped (gently) from Wikipedia using{" "}
+        <a href="https://www.npmjs.com/package/cheerio">Cheerio</a>.
       </p>
       <p>My database contains custom SVG files of each track.</p>
       <p>

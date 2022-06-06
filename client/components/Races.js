@@ -1,5 +1,10 @@
 import React from "react";
-import { getLatestRace, getAllRaces, getRaceLaps } from "../store/allRaces";
+import {
+  getLatestRace,
+  getAllRaces,
+  getRaceLaps,
+  getWiki,
+} from "../store/allRaces";
 import { connect } from "react-redux";
 import D3_view from "./D3_view";
 import Racers from "./Racers";
@@ -12,6 +17,7 @@ class Races extends React.Component {
       raceRound: "",
       raceName: "",
       lap: "",
+      showCircuitInfo: true,
     };
     this.handleYear = this.handleYear.bind(this);
     this.handleRace = this.handleRace.bind(this);
@@ -25,10 +31,11 @@ class Races extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.races !== this.props.races) {
+    const { races, laps } = this.props;
+    if (prevProps.races !== races) {
       this.setState({
-        year: this.props.races[0].season || "",
-        raceRound: this.props.laps.number || "",
+        year: races[0].season || "",
+        raceRound: laps.number || "",
       });
     }
   }
@@ -43,6 +50,7 @@ class Races extends React.Component {
   handleRace(e) {
     e.preventDefault();
     const inner = e.target.children[e.target.value];
+    const { getRace, getWiki, laps } = this.props;
     this.setState({
       raceRound: e.target.value,
       raceName: inner ? inner.innerText : "-- select race --",
@@ -50,11 +58,12 @@ class Races extends React.Component {
     if (e.target.value === "-- select race --") {
       this.reset();
     } else {
-      this.props.getRace(
+      getRace(
         this.state.year,
         e.target.value,
         e.target.children[e.target.value].innerText
       );
+      getWiki(e.target.children[e.target.value].innerText);
     }
   }
   reset() {
@@ -76,13 +85,24 @@ class Races extends React.Component {
       e.target.value
     );
   }
+
+  showInfo = () => {
+    this.setState({
+      showCircuitInfo: !this.state.showCircuitInfo,
+    });
+  };
+
   render() {
     const { races, latest } = this.props;
     const { year, raceRound } = this.state;
 
     return (
       <div className="container">
-        <h1>neeEEEAAAaaaawrwrww</h1>
+        <h1>
+          neeEEEAAAaaaawrwrww
+          <div className="emojis">💨</div>
+          <div className="emojis">🏎️</div>
+        </h1>
         <br />
         <select
           name="year"
@@ -120,7 +140,11 @@ class Races extends React.Component {
         <br />
         {this.state.raceRound !== "" && (
           <section className="mapBox">
-            <Racers handleLap={this.handleLap} />
+            <Racers
+              handleLap={this.handleLap}
+              showCircuitInfo={this.state.showCircuitInfo}
+              showInfo={this.showInfo}
+            />
             <D3_view />
           </section>
         )}
@@ -134,6 +158,7 @@ function getStateFromProps(state) {
     races: state.races,
     latest: state.latest,
     laps: state.laps.race,
+    track: state.track,
   };
 }
 
@@ -143,6 +168,7 @@ function getDispatchFromProps(dispatch) {
     getAllFromYear: (year = 2022) => dispatch(getAllRaces(year)),
     getRace: (year, round, name, lap = 1) =>
       dispatch(getRaceLaps(year, round, name, lap)),
+    getWiki: (slug) => dispatch(getWiki(slug)),
   };
 }
 

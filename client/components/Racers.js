@@ -4,10 +4,19 @@ import { connect } from "react-redux";
 const Racers = (props) => {
   const { laps, handleLap } = props;
   const fastest = {};
-  //   const times = [];
+  const times = [];
+  let lapCount = 0,
+    circuitLength = 0,
+    raceLength = 0;
   let loadedRace = false;
 
   laps.race && laps.race.Timings && (loadedRace = true);
+
+  if (props.track) {
+    lapCount = Number(props.track.Laps);
+    circuitLength = props.track["Circuit length"];
+    raceLength = props.track["Race length"];
+  }
 
   if (loadedRace) {
     laps.race.Timings.forEach((x, i) => {
@@ -15,7 +24,7 @@ const Racers = (props) => {
       const min = Number(timeStr.split(":")[0]);
       const [sec, milli] = timeStr.split(":")[1].split(".");
       const totalMillis = min * 60 * 1000 + Number(sec) * 1000 + Number(milli);
-      //   times.push({ driver: x.driverId, totalMillis });
+      times.push({ driver: x.driverId, totalMillis });
       if (!fastest.totalMillis || fastest.totalMillis > totalMillis) {
         fastest.totalMillis = totalMillis;
         fastest.i = i;
@@ -24,17 +33,34 @@ const Racers = (props) => {
       }
     });
   }
+
   return (
     <div className="mapLeft">
       {loadedRace && (
         <div>
           <div>
+            <button
+              className="circuitButton btn btn-info btn-sm"
+              onClick={props.showInfo}
+            >
+              {props.showCircuitInfo
+                ? "Show circuit info"
+                : "Hide circuit info"}
+            </button>
+            <div className={props.showCircuitInfo ? "hidden" : "marginTop"}>
+              <p>Circuit length - {circuitLength}</p>
+              <p>Total laps - {lapCount}</p>
+              <p>Total race length - {raceLength}</p>
+            </div>
+            <p className="marginTop">
+              <span className={"fastest"}>Fastest</span> lap - {fastest.time}
+            </p>
             <select
               name="lap"
               className="form-select form-select-sm"
               onChange={handleLap}
             >
-              {Array(80) // to do: find correct number of laps
+              {Array(lapCount)
                 .fill(0)
                 .map((_, i) => {
                   return (
@@ -44,13 +70,9 @@ const Racers = (props) => {
                   );
                 })}
             </select>
-
             <br />
           </div>
           <div className={"container"}>
-            <p>
-              <span className={"fastest"}>Fastest</span> lap - {fastest.time}
-            </p>
             <ol>
               {laps.race.Timings.map((x, i) => {
                 return (
@@ -75,6 +97,7 @@ function getStateFromProps(state) {
     races: state.races,
     latest: state.latest,
     laps: state.laps.race,
+    track: state.track,
   };
 }
 
@@ -84,6 +107,7 @@ function getDispatchFromProps(dispatch) {
     getAllFromYear: (year = 2022) => dispatch(getAllRaces(year)),
     getRace: (year, round, name, lap = 1) =>
       dispatch(getRaceLaps(year, round, name, lap)),
+    getWiki: (slug) => dispatch(getWiki(slug)),
   };
 }
 

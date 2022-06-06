@@ -14,11 +14,13 @@ const Routes = () => {
       <div>
         <Navbar />
         <br />
-        <RouteHolder>
-          <Route exact path="/" element={<Races />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/races" element={<Races />} />
-        </RouteHolder>
+        <div className="grey">
+          <RouteHolder>
+            <Route exact path="/" element={<Races />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/races" element={<Races />} />
+          </RouteHolder>
+        </div>
       </div>
     </Router>
   );

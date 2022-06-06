@@ -3,6 +3,7 @@ import axios from "axios";
 const GET_RACES_FROM_YEAR = "GET_RACES_FROM_YEAR";
 const GET_MOST_RECENT = "GET_MOST_RECENT";
 const GET_LAPS = "GET_LAPS";
+const GET_WIKI = "GET_WIKI";
 
 const getAllFromYear = (races) => {
   return {
@@ -25,6 +26,13 @@ const getLaps = (laps) => {
   };
 };
 
+const getWikiData = (track) => {
+  return {
+    type: GET_WIKI,
+    track,
+  };
+};
+
 export const getLatestRace = () => {
   return async (dispatch) => {
     try {
@@ -32,6 +40,18 @@ export const getLatestRace = () => {
         "https://ergast.com/api/f1/current/last/results.json"
       );
       dispatch(getMostRecent(external.data.MRData.RaceTable.Races[0]));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+};
+
+export const getWiki = (track) => {
+  return async (dispatch) => {
+    try {
+      const slug = track.replace(/\s/g, "_");
+      const { data } = await axios.get(`/api/tracks/wiki/${slug}`);
+      dispatch(getWikiData(data));
     } catch (error) {
       console.log(error);
     }
@@ -66,12 +86,14 @@ export const getRaceLaps = (year, round, name, lap) => {
             getLaps({
               race: external.data.MRData.RaceTable.Races[0].Laps[0],
               shape: internal.data.shape,
+              slug,
             })
           )
         : dispatch(
             getLaps({
               race: external.data.MRData.RaceTable.Races,
               shape: internal.data.shape,
+              slug,
             })
           ); // conditional in case selected race hasn't occurred yet (empty array)
     } catch (error) {
@@ -86,6 +108,7 @@ const initialState = {
   laps: {
     race: {},
     shape: "",
+    slug: "",
   },
 };
 
@@ -97,6 +120,8 @@ const raceReducer = (state = initialState, action) => {
       return { ...state, latest: action.race };
     case GET_LAPS:
       return { ...state, laps: { race: action.laps, shape: action.shape } };
+    case GET_WIKI:
+      return { ...state, track: action.track };
     default:
       return state;
   }
